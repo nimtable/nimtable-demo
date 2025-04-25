@@ -36,12 +36,6 @@ RUN pip3 install -r requirements.txt
 # Add scala kernel via spylon-kernel
 RUN python3 -m spylon_kernel install
 
-# Download and install IJava jupyter kernel
-RUN curl https://github.com/SpencerPark/IJava/releases/download/v1.3.0/ijava-1.3.0.zip -Lo ijava-1.3.0.zip \
-  && unzip ijava-1.3.0.zip \
-  && python3 install.py --sys-prefix \
-  && rm ijava-1.3.0.zip
-
 # Optional env variables
 ENV SPARK_HOME=${SPARK_HOME:-"/opt/spark"}
 ENV PYTHONPATH=$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.9.7-src.zip:$PYTHONPATH
@@ -76,9 +70,6 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
  && sudo ./aws/install \
  && rm awscliv2.zip \
  && rm -rf aws/
-
-# Add iceberg spark runtime jar to IJava classpath
-ENV IJAVA_CLASSPATH=/opt/spark/jars/*
 
 RUN mkdir -p /home/iceberg/data \
  && curl https://data.cityofnewyork.us/resource/tg4x-b46p.json > /home/iceberg/data/nyc_film_permits.json \
