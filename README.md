@@ -17,24 +17,50 @@
  under the License.
 -->
 
-# Spark + Iceberg Quickstart Image
+# Nimtable Quickstart Image
+
+Nimtable helps you easily manage and explore Apache Iceberg catalogs. With a web-based platform designed for clarity and simplicity, Nimtable makes it easy to browse tables, run queries, analyze file distributions, and optimize storage layouts.
 
 This is a docker compose environment to quickly get up and running with a Spark environment and a local REST
-catalog, and MinIO as a storage backend.
+catalog, MinIO as a storage backend, and Nimtable for Iceberg lakehouse management.
 
 **note**: If you don't have docker installed, you can head over to the [Get Docker](https://docs.docker.com/get-docker/)
 page for installation instructions.
 
 ## Usage
-Start up the notebook server by running the following.
-```
+
+```bash
 docker-compose up
 ```
 
-The notebook server will then be available at http://localhost:8888
+Wait for all services to start.
 
-While the notebook server is running, you can use any of the following commands if you prefer to use spark-shell, spark-sql, or pyspark.
-```
+The services available are:
+- **Jupyter Notebooks**: http://localhost:8888 (create and manage data)
+- **Nimtable Web Interface**: http://localhost:3000 (explore and analyze data)
+- **MinIO Console**: http://localhost:9001 (admin/password - view storage)
+
+
+The environment comes with a collection of pre-built Jupyter notebooks that demonstrate various Iceberg features and capabilities. **Use these notebooks to learn Iceberg concepts hands-on, while using Nimtable to visualize and monitor the tables you create**.
+
+### How to Use the Notebooks
+1. **Open both interfaces**: Access Jupyter at http://localhost:8888 and Nimtable at http://localhost:3000
+2. **Start learning**: Browse the available notebooks in Jupyter and choose one to start with.
+3. **Run and observe**: Execute notebook cells (Shift+Enter) and immediately check Nimtable to see table changes
+4. **Compare states**: After each major operation in the notebook, refresh Nimtable to observe:
+   - New tables being created
+   - Schema evolution
+   - Snapshot history
+   - File organization
+5. **Experiment**: Modify notebook code and see the real-time impact in Nimtable
+
+**💡 Pro Tip**: Keep both Jupyter and Nimtable open in separate browser tabs for the best learning experience. As you create, modify, and optimize tables in the notebooks, you can immediately see the results in Nimtable's intuitive interface.
+
+## Alternative Access Methods
+
+While the notebook server is running, you can also use these command-line tools:
+
+```bash
 docker exec -it spark-iceberg spark-shell
 ```
 ```
