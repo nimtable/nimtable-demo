@@ -38,7 +38,7 @@ Wait for all services to start.
 The services available are:
 - **Jupyter Notebooks**: http://localhost:8888 (create and manage data)
 - **Nimtable Web Interface**: http://localhost:3000 (explore and analyze data)
-- **MinIO Console**: http://localhost:9001 (admin/password - view storage)
+- **MinIO Console**: http://localhost:9001 (view storage)
 
 
 The environment comes with a collection of pre-built Jupyter notebooks that demonstrate various Iceberg features and capabilities. **Use these notebooks to learn Iceberg concepts hands-on, while using Nimtable to visualize and monitor the tables you create**.
