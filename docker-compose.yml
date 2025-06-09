@@ -79,11 +79,81 @@ services:
       - AWS_REGION=us-east-1
     entrypoint: >
       /bin/sh -c "
-      until (/usr/bin/mc config host add minio http://minio:9000 admin password) do echo '...waiting...' && sleep 1; done;
+      until (/usr/bin/mc alias set minio http://minio:9000 admin password) do echo '...waiting...' && sleep 1; done;
       /usr/bin/mc rm -r --force minio/warehouse;
       /usr/bin/mc mb minio/warehouse;
       /usr/bin/mc anonymous set public minio/warehouse;
       tail -f /dev/null
       "
+  nimtable-database:
+    image: postgres:17
+    container_name: nimtable-database
+    networks:
+      iceberg_net:
+    environment:
+      - POSTGRES_USER=nimtable_user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=nimtable
+    volumes:
+      - nimtable-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nimtable_user -d nimtable"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+  nimtable:
+    image: ghcr.io/nimtable/nimtable:nightly
+    container_name: nimtable
+    depends_on:
+      nimtable-database:
+        condition: service_healthy
+    networks:
+      iceberg_net:
+    ports:
+      - 8182:8182
+    environment:
+      - JAVA_OPTS=-Xmx2g -Xms512m
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+    configs:
+      - source: nimtable-config.yaml
+        target: /nimtable/config.yaml
+  nimtable-web:
+    image: ghcr.io/nimtable/nimtable-web:nightly
+    container_name: nimtable-web
+    depends_on:
+      nimtable:
+        condition: service_started
+    networks:
+      iceberg_net:
+    ports:
+      - 3000:3000
+    environment:
+      - JAVA_API_URL=http://nimtable:8182
+      - DATABASE_URL=postgresql://nimtable_user:password@nimtable-database:5432/nimtable
+volumes:
+  nimtable-data:
+configs:
+  nimtable-config.yaml:
+    content: |
+      server:
+        port: 8182
+        host: 0.0.0.0
+      admin:
+        username: admin
+        password: admin
+      database:
+        url: "jdbc:postgresql://nimtable-database:5432/nimtable"
+        username: "nimtable_user"
+        password: "password"
+      catalogs:
+        - name: "rest"
+          type: "rest"
+          uri: "http://rest:8181"
+          warehouse: "s3://warehouse/"
+          s3.endpoint: "http://minio:9000"
+          s3.path-style-access: "true"
 networks:
   iceberg_net:
